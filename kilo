@@ -1,0 +1,173 @@
+#!/usr/bin/php
+<?php
+#
+# Token should really come from a login but I'm hardcoding for now
+define('KILO_TOKEN', '670390528581a74b9ca1dfaed5f43c2d');
+define('KILO_TIMEZONE', 'America/New_York');
+#
+#
+$help_text = <<<HELP_TEXT
+
+  KILO EXAMPLES
+  -------------
+  kilo Bagel 450                     // create food
+  kilo -d yesterday                  // get entires for date (default is today)
+  kilo -de 12345                     // delete exercise by id
+  kilo -df 12345                     // delete food by id
+  kilo -e Jogging 150                // create exercise
+  kilo -f Bagel 450                  // create food
+  kilo -h                            // this help
+  kilo -l me@example.com pass12345   // login
+  -------------
+
+
+HELP_TEXT;
+#
+try {
+    // print_r($argv);die;
+    #
+    # Set timezone
+    date_default_timezone_set(KILO_TIMEZONE);
+    #
+    # Branch on input
+    if (false) {
+        # code...
+    } else if ($argv[1] == '-d') {
+        $result = get_date($argv[2]);
+        #
+    } else if ($argv[1] == '-de') {
+        $result = delete_exercise($argv[2]);
+        #
+    } else if ($argv[1] == '-df') {
+        $result = delete_food($argv[2]);
+        #
+    } else if ($argv[1] == '-e') {
+        $result = create_exercise($argv[2], $argv[3]);
+        #
+    } else if ($argv[1] == '-f') {
+        $result = create_food($argv[2], $argv[3]);
+        #
+    } else if ($argv[1] == '-h') {
+        die($help_text);
+        #
+    } else if ($argv[1] == '-l') {
+        $result = login($argv[2], $argv[3]);
+        #
+    } else {
+        $result = create_food($argv[1], $argv[2]);
+    }
+    // print_r($result);
+    print_r(get_date('today'));
+
+    // Append a line return
+    echo PHP_EOL;
+
+} catch (Exception $e) {
+    echo $e->getMessage() . PHP_EOL;
+}
+
+// FUNCTIONS
+function create_exercise($description, $calories) {
+    if (empty($description)) {
+        throw new Exception("description is required", 1);
+    }
+    if (empty($calories)) {
+        throw new Exception("calories is required", 1);
+    }
+    $url = 'http://getkilo.com/api/v1/exercises';
+    $date = date('Y-m-d');
+    $time = date('H:i:s');
+    $template = 'curl -s -X POST -H  "Authorization: %s" -d  "calories=%s" -d  "date=%s" -d  "description=%s" -d "time=%s" %s';
+    $cmd = sprintf($template
+        , KILO_TOKEN
+        , $calories
+        , $date
+        , $description
+        , $time
+        , $url
+    );
+    $json = shell_exec($cmd);
+    $object = json_decode($json);
+    return $object;
+}
+function create_food($description, $calories) {
+    if (empty($description)) {
+        throw new Exception("description is required", 1);
+    }
+    if (empty($calories)) {
+        throw new Exception("calories is required", 1);
+    }
+    $url = 'http://getkilo.com/api/v1/foods';
+    $date = date('Y-m-d');
+    $time = date('H:i:s');
+    $template = 'curl -s -X POST -H  "Authorization: %s" -d  "calories=%s" -d  "date=%s" -d  "description=%s" -d "time=%s" %s';
+    $cmd = sprintf($template
+        , KILO_TOKEN
+        , $calories
+        , $date
+        , $description
+        , $time
+        , $url
+    );
+    $json = shell_exec($cmd);
+    $object = json_decode($json);
+    return $object;
+}
+function delete_exercise($id) {
+    $template = 'curl -s -X DELETE -H  "Authorization: %s" http://getkilo.com/api/v1/exercises/id/%s';
+    $cmd = sprintf($template
+        , KILO_TOKEN
+        , $id
+    );
+    $json = shell_exec($cmd);
+    $object = json_decode($json);
+    return $object;
+}
+function delete_food($id) {
+    $template = 'curl -s -X DELETE -H  "Authorization: %s" http://getkilo.com/api/v1/foods/id/%s';
+    $cmd = sprintf($template
+        , KILO_TOKEN
+        , $id
+    );
+    $json = shell_exec($cmd);
+    $object = json_decode($json);
+    return $object;
+}
+function get_date($string) {
+    $string = (empty($string)) ? 'today' : $string;
+    $template = 'curl -s -X GET -H  "Authorization: %s" http://getkilo.com/api/v1/dates/id/%s';
+    $date = date('Y-m-d', strtotime($string));
+    $cmd = sprintf($template
+        , KILO_TOKEN
+        , $date
+    );
+    $json = shell_exec($cmd);
+    $object = json_decode($json);
+    // return $object;
+    $summary = new stdClass();
+    foreach ($object->foods as $entry) {
+        $summary->foods[$entry->id] = $entry->description . ' ' . $entry->calories;
+    }
+    foreach ($object->exercises as $entry) {
+        $summary->exercises[$entry->id] = $entry->description . ' ' . $entry->calories;
+    }
+    return $summary;
+}
+function login($email_address, $password) {
+    if (empty($email_address)) {
+        throw new Exception("email address is required", 1);
+    }
+    if (empty($password)) {
+        throw new Exception("password is required", 1);
+    }
+    $url = 'http://getkilo.com/api/v1/tokens';
+    $template = 'curl -s -X POST -d  "email_address=%s" -d  "password=%s" %s';
+    $cmd = sprintf($template
+        , $email_address
+        , $password
+        , $url
+    );
+    $json = shell_exec($cmd);
+    $object = json_decode($json);
+    return $object;
+}
