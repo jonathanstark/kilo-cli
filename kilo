@@ -57,10 +57,8 @@ try {
     }
     // print_r($result);
     print_r(get_date('today'));
-
-    // Append a line return
-    echo PHP_EOL;
-
+    die;
+    #
 } catch (Exception $e) {
     echo $e->getMessage() . PHP_EOL;
 }
