@@ -74,10 +74,9 @@ function create_exercise($description, $calories) {
     if (empty($calories)) {
         throw new Exception("calories is required", 1);
     }
-    $url = 'http://getkilo.com/api/v1/exercises';
     $date = date('Y-m-d');
     $time = date('H:i:s');
-    $template = 'curl -s -X POST -H  "Authorization: %s" -d  "calories=%s" -d  "date=%s" -d  "description=%s" -d "time=%s" %s';
+    $template = 'curl -s -X POST -H "Authorization: %s" -d  "calories=%s" -d  "date=%s" -d  "description=%s" -d "time=%s" http://getkilo.com/api/v1/exercises';
     $cmd = sprintf($template
         , KILO_TOKEN
         , $calories
@@ -100,17 +99,15 @@ function create_food($description, $calories) {
     if (empty($calories)) {
         throw new Exception("calories is required", 1);
     }
-    $url = 'http://getkilo.com/api/v1/foods';
     $date = date('Y-m-d');
     $time = date('H:i:s');
-    $template = 'curl -s -X POST -H  "Authorization: %s" -d  "calories=%s" -d  "date=%s" -d  "description=%s" -d "time=%s" %s';
+    $template = 'curl -s -X POST -H "Authorization: %s" -d "calories=%s" -d "date=%s" -d "description=%s" -d "time=%s" http://getkilo.com/api/v1/foods';
     $cmd = sprintf($template
         , KILO_TOKEN
         , $calories
         , $date
         , $description
         , $time
-        , $url
     );
     $json = shell_exec($cmd);
     $object = json_decode($json);
@@ -120,7 +117,7 @@ function delete_exercise($id) {
     if (!KILO_TOKEN) {
         throw new Exception("please login and try again", 1);
     }
-    $template = 'curl -s -X DELETE -H  "Authorization: %s" http://getkilo.com/api/v1/exercises/id/%s';
+    $template = 'curl -s -X DELETE -H "Authorization: %s" http://getkilo.com/api/v1/exercises/id/%s';
     $cmd = sprintf($template
         , KILO_TOKEN
         , $id
@@ -133,7 +130,7 @@ function delete_food($id) {
     if (!KILO_TOKEN) {
         throw new Exception("please login and try again", 1);
     }
-    $template = 'curl -s -X DELETE -H  "Authorization: %s" http://getkilo.com/api/v1/foods/id/%s';
+    $template = 'curl -s -X DELETE -H "Authorization: %s" http://getkilo.com/api/v1/foods/id/%s';
     $cmd = sprintf($template
         , KILO_TOKEN
         , $id
@@ -147,7 +144,7 @@ function get_date($string) {
         throw new Exception("please login and try again", 1);
     }
     $string = (empty($string)) ? 'today' : $string;
-    $template = 'curl -s -X GET -H  "Authorization: %s" http://getkilo.com/api/v1/dates/id/%s';
+    $template = 'curl -s -X GET -H "Authorization: %s" http://getkilo.com/api/v1/dates/id/%s';
     $date = date('Y-m-d', strtotime($string));
     $cmd = sprintf($template
         , KILO_TOKEN
@@ -173,7 +170,7 @@ function login($email_address, $password) {
         throw new Exception("password is required", 1);
     }
     $url = 'http://getkilo.com/api/v1/tokens';
-    $template = 'curl -s -X POST -d  "email_address=%s" -d  "password=%s" %s';
+    $template = 'curl -s -X POST -d "email_address=%s" -d "password=%s" %s';
     $cmd = sprintf($template
         , $email_address
         , $password
