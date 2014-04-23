@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 #
-define('KILO_DATABASE', './kilo_data');
+define('KILO_DATABASE', __DIR__ . '/.kilo');
 define('KILO_TIMEZONE', 'America/New_York');
 define('KILO_TOKEN', @file_get_contents(KILO_DATABASE));
 #
