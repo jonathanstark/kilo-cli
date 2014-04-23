@@ -1,10 +1,9 @@
 #!/usr/bin/php
 <?php
 #
-# Token should really come from a login but I'm hardcoding for now
-define('KILO_TOKEN', '670390528581a74b9ca1dfaed5f43c2d');
+define('KILO_DATABASE', './kilo_data');
 define('KILO_TIMEZONE', 'America/New_York');
-#
+define('KILO_TOKEN', @file_get_contents(KILO_DATABASE));
 #
 $help_text = <<<HELP_TEXT
 
@@ -68,6 +67,9 @@ try {
 
 // FUNCTIONS
 function create_exercise($description, $calories) {
+    if (!KILO_TOKEN) {
+        throw new Exception("please login and try again", 1);
+    }
     if (empty($description)) {
         throw new Exception("description is required", 1);
     }
@@ -91,6 +93,9 @@ function create_exercise($description, $calories) {
     return $object;
 }
 function create_food($description, $calories) {
+    if (!KILO_TOKEN) {
+        throw new Exception("please login and try again", 1);
+    }
     if (empty($description)) {
         throw new Exception("description is required", 1);
     }
@@ -114,6 +119,9 @@ function create_food($description, $calories) {
     return $object;
 }
 function delete_exercise($id) {
+    if (!KILO_TOKEN) {
+        throw new Exception("please login and try again", 1);
+    }
     $template = 'curl -s -X DELETE -H  "Authorization: %s" http://getkilo.com/api/v1/exercises/id/%s';
     $cmd = sprintf($template
         , KILO_TOKEN
@@ -124,6 +132,9 @@ function delete_exercise($id) {
     return $object;
 }
 function delete_food($id) {
+    if (!KILO_TOKEN) {
+        throw new Exception("please login and try again", 1);
+    }
     $template = 'curl -s -X DELETE -H  "Authorization: %s" http://getkilo.com/api/v1/foods/id/%s';
     $cmd = sprintf($template
         , KILO_TOKEN
@@ -134,6 +145,9 @@ function delete_food($id) {
     return $object;
 }
 function get_date($string) {
+    if (!KILO_TOKEN) {
+        throw new Exception("please login and try again", 1);
+    }
     $string = (empty($string)) ? 'today' : $string;
     $template = 'curl -s -X GET -H  "Authorization: %s" http://getkilo.com/api/v1/dates/id/%s';
     $date = date('Y-m-d', strtotime($string));
@@ -169,5 +183,6 @@ function login($email_address, $password) {
     );
     $json = shell_exec($cmd);
     $object = json_decode($json);
-    return $object;
+    file_put_contents(KILO_DATABASE, $object->access_token);
+    die("you have been logged in\n");
 }
