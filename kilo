@@ -1,6 +1,9 @@
 #!/usr/bin/php
 <?php
 #
+# Use a line something like the following to link kilo into your PATH:
+# ln -s /Users/jstark/dev/kilo-cli/kilo /Users/jstark/bin/kilo
+#
 define('KILO_DATABASE', __DIR__ . '/.kilo');
 define('KILO_TIMEZONE', 'America/New_York');
 define('KILO_TOKEN', @file_get_contents(KILO_DATABASE));
