@@ -77,7 +77,7 @@ try {
     if (false) {
         # code...
     } else if ($argv[1] == '-d') {
-        $result = get_date($argv[2]);
+        $result = get_date(array_slice($argv, 2));
         #
     } else if ($argv[1] == '-de') {
         $result = delete_exercise($argv[2]);
@@ -86,10 +86,10 @@ try {
         $result = delete_food($argv[2]);
         #
     } else if ($argv[1] == '-e') {
-        $result = create_exercise($argv[2], $argv[3]);
+        $result = create_exercise(array_slice($argv, 2));
         #
     } else if ($argv[1] == '-f') {
-        $result = create_food($argv[2], $argv[3]);
+        $result = create_food(array_slice($argv, 2));
         #
     } else if ($argv[1] == '-h') {
         die($help_text);
@@ -98,58 +98,53 @@ try {
         $result = login($argv[2], $argv[3]);
         #
     } else {
-        $result = create_food($argv[1], $argv[2]);
+        $result = create_food(array_slice($argv, 1));
     }
     // print_r($result);
     print_r(get_date('today'));
     die;
     #
 } catch (Exception $e) {
-    echo $e->getMessage() . PHP_EOL;
+    echo "\nkilo: " . $e->getMessage() . ". For help, enter: kilo -h\n\n";
 }
 
 // FUNCTIONS
-function create_exercise($description, $calories) {
+function create_exercise($values) {
     if (!KILO_TOKEN) {
         throw new Exception("please login and try again", 1);
     }
-    if (empty($description)) {
-        throw new Exception("description is required", 1);
+    if (count($values) < 2) {
+        throw new Exception("description and calories are required", 1);
     }
-    if (empty($calories)) {
-        throw new Exception("calories is required", 1);
-    }
-    $date = date('Y-m-d');
-    $description = ucwords($description);
-    $time = date('H:i:s');
-    $template = 'curl -s -X POST -H "Authorization: %s" -d  "calories=%s" -d  "date=%s" -d  "description=%s" -d "time=%s" http://getkilo.com/api/v1/exercises';
-    $cmd = sprintf($template
+    $calories    = urlencode(array_pop($values));
+    $date        = date('Y-m-d');
+    $description = urlencode(ucwords(implode(' ', $values)));
+    $time        = date('H:i:s');
+    $cmd = sprintf(
+        'curl -s -X POST -H "Authorization: %s" -d  "calories=%s" -d  "date=%s" -d  "description=%s" -d "time=%s" http://getkilo.com/api/v1/exercises'
         , KILO_TOKEN
         , $calories
         , $date
         , $description
         , $time
-        , $url
     );
     $json = shell_exec($cmd);
     $object = json_decode($json);
     return $object;
 }
-function create_food($description, $calories) {
+function create_food($values) {
     if (!KILO_TOKEN) {
         throw new Exception("please login and try again", 1);
     }
-    if (empty($description)) {
-        throw new Exception("description is required", 1);
+    if (count($values) < 2) {
+        throw new Exception("description and calories are required", 1);
     }
-    if (empty($calories)) {
-        throw new Exception("calories is required", 1);
-    }
-    $date = date('Y-m-d');
-    $description = ucwords($description);
-    $time = date('H:i:s');
-    $template = 'curl -s -X POST -H "Authorization: %s" -d "calories=%s" -d "date=%s" -d "description=%s" -d "time=%s" http://getkilo.com/api/v1/foods';
-    $cmd = sprintf($template
+    $calories    = urlencode(array_pop($values));
+    $date        = date('Y-m-d');
+    $description = urlencode(ucwords(implode(' ', $values)));
+    $time        = date('H:i:s');
+    $cmd = sprintf(
+        'curl -s -X POST -H "Authorization: %s" -d "calories=%s" -d "date=%s" -d "description=%s" -d "time=%s" http://getkilo.com/api/v1/foods'
         , KILO_TOKEN
         , $calories
         , $date
@@ -164,8 +159,8 @@ function delete_exercise($id) {
     if (!KILO_TOKEN) {
         throw new Exception("please login and try again", 1);
     }
-    $template = 'curl -s -X DELETE -H "Authorization: %s" http://getkilo.com/api/v1/exercises/id/%s';
-    $cmd = sprintf($template
+    $cmd = sprintf(
+        'curl -s -X DELETE -H "Authorization: %s" http://getkilo.com/api/v1/exercises/id/%s'
         , KILO_TOKEN
         , $id
     );
@@ -177,8 +172,8 @@ function delete_food($id) {
     if (!KILO_TOKEN) {
         throw new Exception("please login and try again", 1);
     }
-    $template = 'curl -s -X DELETE -H "Authorization: %s" http://getkilo.com/api/v1/foods/id/%s';
-    $cmd = sprintf($template
+    $cmd = sprintf(
+        'curl -s -X DELETE -H "Authorization: %s" http://getkilo.com/api/v1/foods/id/%s'
         , KILO_TOKEN
         , $id
     );
@@ -186,20 +181,20 @@ function delete_food($id) {
     $object = json_decode($json);
     return $object;
 }
-function get_date($string) {
+function get_date($values) {
     if (!KILO_TOKEN) {
         throw new Exception("please login and try again", 1);
     }
-    $string = (empty($string)) ? 'today' : $string;
-    $template = 'curl -s -X GET -H "Authorization: %s" http://getkilo.com/api/v1/dates/id/%s';
-    $date = date('Y-m-d', strtotime($string));
-    $cmd = sprintf($template
+    $string   = (empty($values)) ? 'today' : implode(' ', $values);
+    $date     = date('Y-m-d', strtotime($string));
+    die($date);
+    $cmd      = sprintf(
+        'curl -s -X GET -H "Authorization: %s" http://getkilo.com/api/v1/dates/id/%s'
         , KILO_TOKEN
         , $date
     );
-    $json = shell_exec($cmd);
-    $object = json_decode($json);
-    // return $object;
+    $json    = shell_exec($cmd);
+    $object  = json_decode($json);
     $summary = new stdClass();
     foreach ($object->foods as $entry) {
         $summary->foods[$entry->id] = $entry->description . ' ' . $entry->calories;
@@ -216,15 +211,13 @@ function login($email_address, $password) {
     if (empty($password)) {
         throw new Exception("password is required", 1);
     }
-    $url = 'http://getkilo.com/api/v1/tokens';
-    $template = 'curl -s -X POST -d "email_address=%s" -d "password=%s" %s';
-    $cmd = sprintf($template
+    $cmd = sprintf(
+        'curl -s -X POST -d "email_address=%s" -d "password=%s" http://getkilo.com/api/v1/tokens'
         , $email_address
         , $password
-        , $url
     );
     $json = shell_exec($cmd);
     $object = json_decode($json);
     file_put_contents(KILO_DATABASE, $object->access_token);
-    die("you have been logged in\n");
+    die("\nkilo: you are now logged in\n\n");
 }
