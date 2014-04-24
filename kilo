@@ -78,6 +78,7 @@ function create_exercise($description, $calories) {
         throw new Exception("calories is required", 1);
     }
     $date = date('Y-m-d');
+    $description = ucwords($description);
     $time = date('H:i:s');
     $template = 'curl -s -X POST -H "Authorization: %s" -d  "calories=%s" -d  "date=%s" -d  "description=%s" -d "time=%s" http://getkilo.com/api/v1/exercises';
     $cmd = sprintf($template
@@ -103,6 +104,7 @@ function create_food($description, $calories) {
         throw new Exception("calories is required", 1);
     }
     $date = date('Y-m-d');
+    $description = ucwords($description);
     $time = date('H:i:s');
     $template = 'curl -s -X POST -H "Authorization: %s" -d "calories=%s" -d "date=%s" -d "description=%s" -d "time=%s" http://getkilo.com/api/v1/foods';
     $cmd = sprintf($template
