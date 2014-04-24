@@ -77,31 +77,29 @@ try {
     if (false) {
         # code...
     } else if ($argv[1] == '-d') {
-        $result = get_date(array_slice($argv, 2));
+        show_date(implode(' ', array_slice($argv, 2)));
         #
     } else if ($argv[1] == '-de') {
-        $result = delete_exercise($argv[2]);
+        delete_exercise($argv[2]);
         #
     } else if ($argv[1] == '-df') {
-        $result = delete_food($argv[2]);
+        delete_food($argv[2]);
         #
     } else if ($argv[1] == '-e') {
-        $result = create_exercise(array_slice($argv, 2));
+        create_exercise(array_slice($argv, 2));
         #
     } else if ($argv[1] == '-f') {
-        $result = create_food(array_slice($argv, 2));
+        create_food(array_slice($argv, 2));
         #
     } else if ($argv[1] == '-h') {
         die($help_text);
         #
     } else if ($argv[1] == '-l') {
-        $result = login($argv[2], $argv[3]);
+        login($argv[2], $argv[3]);
         #
     } else {
-        $result = create_food(array_slice($argv, 1));
+        create_food(array_slice($argv, 1));
     }
-    // print_r($result);
-    print_r(get_date('today'));
     die;
     #
 } catch (Exception $e) {
@@ -130,6 +128,7 @@ function create_exercise($values) {
     );
     $json = shell_exec($cmd);
     $object = json_decode($json);
+    show_date($date);
     return $object;
 }
 function create_food($values) {
@@ -153,6 +152,7 @@ function create_food($values) {
     );
     $json = shell_exec($cmd);
     $object = json_decode($json);
+    show_date($date);
     return $object;
 }
 function delete_exercise($id) {
@@ -166,6 +166,7 @@ function delete_exercise($id) {
     );
     $json = shell_exec($cmd);
     $object = json_decode($json);
+    show_date();
     return $object;
 }
 function delete_food($id) {
@@ -179,30 +180,8 @@ function delete_food($id) {
     );
     $json = shell_exec($cmd);
     $object = json_decode($json);
+    show_date();
     return $object;
-}
-function get_date($values) {
-    if (!KILO_TOKEN) {
-        throw new Exception("please login and try again", 1);
-    }
-    $string   = (empty($values)) ? 'today' : implode(' ', $values);
-    $date     = date('Y-m-d', strtotime($string));
-    die($date);
-    $cmd      = sprintf(
-        'curl -s -X GET -H "Authorization: %s" http://getkilo.com/api/v1/dates/id/%s'
-        , KILO_TOKEN
-        , $date
-    );
-    $json    = shell_exec($cmd);
-    $object  = json_decode($json);
-    $summary = new stdClass();
-    foreach ($object->foods as $entry) {
-        $summary->foods[$entry->id] = $entry->description . ' ' . $entry->calories;
-    }
-    foreach ($object->exercises as $entry) {
-        $summary->exercises[$entry->id] = $entry->description . ' ' . $entry->calories;
-    }
-    return $summary;
 }
 function login($email_address, $password) {
     if (empty($email_address)) {
@@ -220,4 +199,27 @@ function login($email_address, $password) {
     $object = json_decode($json);
     file_put_contents(KILO_DATABASE, $object->access_token);
     die("\nkilo: you are now logged in\n\n");
+}
+function show_date($string='') {
+    if (!KILO_TOKEN) {
+        throw new Exception("please login and try again", 1);
+    }
+    $string   = (empty($string)) ? 'today' : $string;
+    $date     = date('Y-m-d', strtotime($string));
+    $cmd      = sprintf(
+        'curl -s -X GET -H "Authorization: %s" http://getkilo.com/api/v1/dates/id/%s'
+        , KILO_TOKEN
+        , $date
+    );
+    $json    = shell_exec($cmd);
+    $object  = json_decode($json);
+    $summary = new stdClass();
+    foreach ($object->foods as $entry) {
+        $summary->foods[$entry->id] = $entry->description . ' ' . $entry->calories;
+    }
+    foreach ($object->exercises as $entry) {
+        $summary->exercises[$entry->id] = $entry->description . ' ' . $entry->calories;
+    }
+    print_r($summary);
+    return $summary;
 }
