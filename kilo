@@ -10,17 +10,59 @@ define('KILO_TOKEN', @file_get_contents(KILO_DATABASE));
 #
 $help_text = <<<HELP_TEXT
 
-  KILO EXAMPLES
-  -------------
-  kilo Bagel 450                     // create food
-  kilo -d yesterday                  // get entires for date (default is today)
-  kilo -de 12345                     // delete exercise by id
-  kilo -df 12345                     // delete food by id
-  kilo -e Jogging 150                // create exercise
-  kilo -f Bagel 450                  // create food
-  kilo -h                            // this help
-  kilo -l me@example.com pass12345   // login
-  -------------
+KILO DOCUMENTATION
+
+The following commands are supported by the kilo cli:
+
+kilo -d <date>                // get entries for date (leave blank for today)
+kilo -de <exercise_id>        // delete exercise by id
+kilo -df <food_id>            // delete food by id
+kilo -e <exercise> <calories> // create an exercise entry
+kilo -f <food> <calories>     // create a food entry
+kilo -h                       // this help documentation
+kilo -l <email> <password>    // login to the kilo api
+
+Here are a bunch of example commands:
+
+kilo -d                          // get entries for today
+kilo -d 2014-12-31               // get entries for Dec 31, 2014
+kilo -d yesterday                // get entries for yesterday
+kilo -d 2 days ago               // get entries for yesterday
+kilo -de 12345                   // delete exercise by id
+kilo -df 12345                   // delete food by id
+kilo -e jogging 150              // create an exercise entry
+kilo -f bagel 450                // create a food entry
+kilo -h                          // this help documentation
+kilo -l me@example.com pass12345 // login
+
+NOTES
+
+Creating food entries is the primary action, so as a convenience
+you can omit the -f flag, like so:
+
+    kilo bagel 400
+    kilo bagel and cream cheese 475
+
+When searching for a date, you can use pretty much any string in the
+english language that represents a date, like so:
+
+    kilo -d yesterday
+    kilo -d 2 days ago
+    kilo -d -3days
+
+When creating food or exercises, kilo assumes last word
+is calories. So, the following examples work as expected:
+
+    kilo -f bagel and cream cheese 475
+    kilo -e walking the dogs 150
+
+The ampersand character can't be used "naked" as input to
+any commands, so it must be quoted or escaped like so:
+
+    kilo -f "bagel & cream cheese" 475
+    kilo -f bagel \& cream cheese 475
+
+For more info, you can contact me at jstark@jonathanstark.com
 
 
 HELP_TEXT;
