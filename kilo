@@ -243,6 +243,4 @@ function show_date($string='') {
     printf($template, '', '', $total);
     echo "\n";
     echo "\n";
-
-
 }
