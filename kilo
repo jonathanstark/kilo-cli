@@ -101,11 +101,13 @@ try {
     } else {
         create_food(array_slice($argv, 1));
     }
-    die;
     #
 } catch (Exception $e) {
     echo "\nkilo: " . $e->getMessage() . ". For help, enter: kilo -h\n\n";
 }
+#
+# We out...
+die;
 
 // FUNCTIONS
 function create_exercise($values) {
@@ -214,13 +216,29 @@ function show_date($string='') {
     );
     $json    = shell_exec($cmd);
     $object  = json_decode($json);
-    $summary = new stdClass();
+    $total = 0;
+    $template = "%-10s %-20s %8s\n";
+    #
+    # Start puking...
+    echo "========================================\n";
+    echo "Kilo totals for ".date('D M j, Y', strtotime($string))."\n";
+    echo "----------------------------------------\n";
+    printf($template, 'ID', 'Description', 'Calories');
+    echo "----------------------------------------\n";
+    echo "FOODS\n";
     foreach ($object->foods as $entry) {
-        $summary->foods[$entry->id] = $entry->description . ' ' . $entry->calories;
+        printf($template, $entry->id, $entry->description, $entry->calories);
+        $total+= (int)$entry->calories;
     }
+    echo "----------------------------------------\n";
+    echo "EXERCISES\n";
     foreach ($object->exercises as $entry) {
-        $summary->exercises[$entry->id] = $entry->description . ' ' . $entry->calories;
+        printf($template, $entry->id, $entry->description, $entry->calories);
+        $total-= (int)$entry->calories;
     }
-    print_r($summary);
-    return $summary;
+    echo "----------------------------------------\n";
+    printf($template, '', '', $total);
+    echo "----------------------------------------\n\n";
+
+
 }
