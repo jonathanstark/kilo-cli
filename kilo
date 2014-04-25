@@ -14,7 +14,8 @@ KILO DOCUMENTATION
 
 The following commands are supported by the kilo cli:
 
-kilo -d <date>                // get entries for date (leave blank for today)
+kilo                          // get entries for today
+kilo -d <date>                // get entries for date
 kilo -de <exercise_id>        // delete exercise by id
 kilo -df <food_id>            // delete food by id
 kilo -e <exercise> <calories> // create an exercise entry
@@ -24,10 +25,10 @@ kilo -l <email> <password>    // login to the kilo api
 
 Here are a bunch of example commands:
 
-kilo -d                          // get entries for today
-kilo -d 2014-12-31               // get entries for Dec 31, 2014
+kilo                             // get entries for today
 kilo -d yesterday                // get entries for yesterday
 kilo -d 2 days ago               // get entries for yesterday
+kilo -d 2014-12-31               // get entries for Dec 31, 2014
 kilo -de 12345                   // delete exercise by id
 kilo -df 12345                   // delete food by id
 kilo -e jogging 150              // create an exercise entry
@@ -74,8 +75,8 @@ try {
     date_default_timezone_set(KILO_TIMEZONE);
     #
     # Branch on input
-    if (false) {
-        # code...
+    if (count($argv) == 1) {
+        show_date();
     } else if ($argv[1] == '-d') {
         show_date(implode(' ', array_slice($argv, 2)));
         #
