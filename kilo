@@ -220,25 +220,29 @@ function show_date($string='') {
     $template = "%-10s %-20s %8s\n";
     #
     # Start puking...
-    echo "========================================\n";
-    echo "Kilo totals for ".date('D M j, Y', strtotime($string))."\n";
-    echo "----------------------------------------\n";
-    printf($template, 'ID', 'Description', 'Calories');
-    echo "----------------------------------------\n";
+    echo "\n";
+    echo strtoupper("Kilo for ".date('D M j, Y', strtotime($string))."\n");
+    echo "\n";
     echo "FOODS\n";
+    echo "\n";
+    printf($template, 'ID', 'Description', 'Calories');
     foreach ($object->foods as $entry) {
         printf($template, $entry->id, $entry->description, $entry->calories);
         $total+= (int)$entry->calories;
     }
-    echo "----------------------------------------\n";
+    echo "\n";
     echo "EXERCISES\n";
+    echo "\n";
+    printf($template, 'ID', 'Description', 'Calories');
     foreach ($object->exercises as $entry) {
         printf($template, $entry->id, $entry->description, $entry->calories);
         $total-= (int)$entry->calories;
     }
-    echo "----------------------------------------\n";
+    echo "\n";
+    printf($template, '', '', 'Total');
     printf($template, '', '', $total);
-    echo "----------------------------------------\n\n";
+    echo "\n";
+    echo "\n";
 
 
 }
