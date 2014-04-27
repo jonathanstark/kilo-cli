@@ -221,7 +221,7 @@ function show_date($string='') {
     #
     # Start puking...
     echo "\n";
-    echo strtoupper("Kilo for ".date('D M j, Y', strtotime($string))."\n");
+    echo "CALORIES FOR " . strtoupper(date('D M j, Y', strtotime($string))) . "\n";
     echo "\n";
     echo "FOODS\n";
     echo "\n";
