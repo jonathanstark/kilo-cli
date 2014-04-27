@@ -131,6 +131,9 @@ function create_exercise($values) {
     );
     $json = shell_exec($cmd);
     $object = json_decode($json);
+    if (isset($object->error)) {
+        throw new Exception($object->error, 1);
+    }
     show_date($date);
     return $object;
 }
@@ -155,6 +158,9 @@ function create_food($values) {
     );
     $json = shell_exec($cmd);
     $object = json_decode($json);
+    if (isset($object->error)) {
+        throw new Exception($object->error, 1);
+    }
     show_date($date);
     return $object;
 }
@@ -169,6 +175,9 @@ function delete_exercise($id) {
     );
     $json = shell_exec($cmd);
     $object = json_decode($json);
+    if (isset($object->error)) {
+        throw new Exception($object->error, 1);
+    }
     show_date();
     return $object;
 }
@@ -183,6 +192,9 @@ function delete_food($id) {
     );
     $json = shell_exec($cmd);
     $object = json_decode($json);
+    if (isset($object->error)) {
+        throw new Exception($object->error, 1);
+    }
     show_date();
     return $object;
 }
@@ -200,8 +212,11 @@ function login($email_address, $password) {
     );
     $json = shell_exec($cmd);
     $object = json_decode($json);
+    if (isset($object->error)) {
+        throw new Exception($object->error, 1);
+    }
     file_put_contents(KILO_DATABASE, $object->access_token);
-    die("\nkilo: you are now logged in\n\n");
+    show_date();
 }
 function show_date($string='') {
     if (!KILO_TOKEN) {
@@ -216,6 +231,9 @@ function show_date($string='') {
     );
     $json    = shell_exec($cmd);
     $object  = json_decode($json);
+    if (isset($object->error)) {
+        throw new Exception($object->error, 1);
+    }
     $total = 0;
     $template = "%-10s %-20s %8s\n";
     #
