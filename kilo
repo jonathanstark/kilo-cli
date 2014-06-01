@@ -245,7 +245,7 @@ function show_date($string='') {
     echo "\n";
     printf($template, 'ID', 'Description', 'Calories');
     foreach ($object->foods as $entry) {
-        printf($template, $entry->id, $entry->description, $entry->calories);
+        printf($template, $entry->id, substr($entry->description, 0, 20), $entry->calories);
         $total+= (int)$entry->calories;
     }
     echo "\n";
@@ -253,7 +253,7 @@ function show_date($string='') {
     echo "\n";
     printf($template, 'ID', 'Description', 'Calories');
     foreach ($object->exercises as $entry) {
-        printf($template, $entry->id, $entry->description, $entry->calories);
+        printf($template, $entry->id, substr($entry->description, 0, 20), $entry->calories);
         $total-= (int)$entry->calories;
     }
     echo "\n";
