@@ -2,7 +2,7 @@
 <?php
 #
 # Use a line something like the following to link kilo into your PATH:
-# ln -s /Users/jstark/dev/kilo-cli/kilo /Users/jstark/bin/kilo
+# ln -s ~/dev/kilo-cli/kilo ~/bin/kilo
 #
 define('KILO_DATABASE', __DIR__ . '/.kilo');
 define('KILO_TIMEZONE', 'America/New_York');
